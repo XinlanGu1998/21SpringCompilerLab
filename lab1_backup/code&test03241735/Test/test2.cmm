@@ -1,0 +1,25 @@
+int test(int x,int ){}
+int test(int x,int y){}
+int test(,int y){}
+int a;
+int test){}
+int main(){
+	int a,;
+	float a[10][2];
+	a[1][1 = 1;
+	a[5,3] = 1.5;
+	test(a,b);
+	test(a,);
+	test(,);
+	test(int);
+
+	if(a[1][2] == 0){
+		 i = 1
+	}
+	else i = 0; 
+	if (a) a; else b;
+	if () a; else b;
+	if ) a else b;
+	while (int) b;
+	return 2;
+	a[5];

@@ -1,0 +1,6 @@
+find_Func:name=main, failed.
+Insert_Func:r_type=0, name=main, defined=1
+find_Stru:name=Position, failed.
+find_Sym:name=pos, failed.
+find_Stru:name=pos, failed.
+Insert_Sym:type=0, name=pos

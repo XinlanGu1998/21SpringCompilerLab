@@ -1,0 +1,9 @@
+find_Sym:name=a, failed.
+find_Stru:name=a, failed.
+Insert_Sym:type=0, name=a
+find_Func:name=func, failed.
+Insert_Func:r_type=0, name=func, defined=0
+find_Sym:name=a, found.
+find_Func:name=func, found.
+find_Func:name=main, failed.
+Insert_Func:r_type=0, name=main, defined=1

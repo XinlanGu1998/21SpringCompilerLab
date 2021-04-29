@@ -1,0 +1,11 @@
+int main()
+{
+    int i = 09;
+    int j = 0x3G;
+    int i = ;
+    j = 0x3G;
+    j = a+;
+    j =;
+    j = a && ;
+    j =  || a;
+}

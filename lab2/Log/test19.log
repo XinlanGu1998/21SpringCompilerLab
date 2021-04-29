@@ -1,0 +1,22 @@
+find_Stru:name=Position, failed.
+find_Sym:name=Position, failed.
+find_Sym:name=x, failed.
+find_Stru:name=x, failed.
+Insert_Sym:type=0, name=x
+find_Sym:name=y, failed.
+find_Stru:name=y, failed.
+Insert_Sym:type=0, name=y
+Insert_Struc:type=2, name=Position
+Insert_Sym:type=2, name=0
+find_Sym:name=a, failed.
+find_Stru:name=a, failed.
+Insert_Sym:type=0, name=a
+find_Func:name=func, failed.
+Insert_Func:r_type=0, name=func, defined=0
+find_Stru:name=Position, found.
+find_Sym:name=p, failed.
+find_Stru:name=p, failed.
+Insert_Sym:type=2, name=p
+find_Func:name=func, found.
+find_Func:name=main, failed.
+Insert_Func:r_type=0, name=main, defined=1

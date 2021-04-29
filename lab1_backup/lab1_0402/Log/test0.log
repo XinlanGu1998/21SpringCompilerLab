@@ -1,0 +1,18 @@
+Starting parse
+Entering state 0
+Reading a token: Now at end of input.
+Reducing stack by rule 3 (line 48):
+-> $$ = nterm ExtDefList (1.1: )
+Stack now 0
+Entering state 5
+Reducing stack by rule 1 (line 44):
+   $1 = nterm ExtDefList (1.1: )
+-> $$ = nterm Program (1.1: )
+Stack now 0
+Entering state 4
+Now at end of input.
+Shifting token $end (1.1: )
+Entering state 13
+Stack now 0 4 13
+Cleanup: popping token $end (1.1: )
+Cleanup: popping nterm Program (1.1: )
