@@ -1,5 +1,0 @@
-int a,b;
-int c[3];
-int f1(){}
-int f2(int x, int y){}
-int f3(int f1, int a){}
