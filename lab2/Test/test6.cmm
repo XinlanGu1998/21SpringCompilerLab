@@ -1,0 +1,5 @@
+int main()
+{
+    int i = 0x9;
+    int j = 03;
+}

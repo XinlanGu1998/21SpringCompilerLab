@@ -1,0 +1,83 @@
+FUNCTION f1 :
+PARAM v1
+PARAM v2
+DEC v3 400
+v4 := #1
+v5 := #0
+v6 := #0
+v7 := #0
+LABEL label1 :
+IF v4 <= v1 GOTO label2
+GOTO label3
+LABEL label2 :
+t8 := #1
+t10 := &v3
+t12 := v4 * #4
+t9 := t10 + t12
+*t9 := t8
+t7 := *t9
+t14 := v4 + #1
+v4 := t14
+GOTO label1
+LABEL label3 :
+v4 := #1
+t17 := v4
+LABEL label4 :
+IF v4 <= v1 GOTO label5
+GOTO label6
+LABEL label5 :
+t23 := &v3
+t25 := #4 * v4
+t26 := t25 + t23
+t21 := *t26
+IF t21 == #1 GOTO label7
+GOTO label8
+LABEL label7 :
+t31 := &v3
+t33 := #4 * v4
+t34 := t33 + t31
+t30 := *t34
+t28 := v5 + t30
+v5 := t28
+IF v5 == v2 GOTO label10
+GOTO label11
+LABEL label10 :
+WRITE v4
+v5 := #0
+t42 := #0
+t44 := &v3
+t46 := v4 * #4
+t43 := t44 + t46
+*t43 := t42
+t41 := *t43
+t48 := v6 + #1
+v6 := t48
+t47 := v6
+LABEL label11 :
+IF v6 == v1 GOTO label13
+GOTO label14
+LABEL label13 :
+v7 := v4
+RETURN #0
+LABEL label14 :
+LABEL label8 :
+IF v4 == v1 GOTO label16
+GOTO label17
+LABEL label16 :
+v4 := #0
+t58 := v4
+LABEL label17 :
+t61 := v4 + #1
+v4 := t61
+GOTO label4
+LABEL label6 :
+RETURN #0
+FUNCTION main :
+READ t66
+v8 := t66
+READ t68
+v9 := t68
+ARG v9
+ARG v8
+t69 := CALL f1
+RETURN #0

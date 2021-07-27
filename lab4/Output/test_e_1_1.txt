@@ -1,0 +1,1 @@
+can not translate, there exists variables or params of struct types.

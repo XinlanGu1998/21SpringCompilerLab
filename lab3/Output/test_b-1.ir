@@ -1,0 +1,38 @@
+FUNCTION f1 :
+PARAM v1
+PARAM v2
+PARAM v3
+PARAM v4
+IF v1 == #1 GOTO label1
+GOTO label2
+LABEL label1 :
+t5 := v2 * #1000000
+t4 := t5 + v4
+WRITE t4
+GOTO label3
+LABEL label2 :
+ARG v3
+ARG v4
+ARG v2
+t13 := v1 - #1
+ARG t13
+t9 := CALL f1
+t18 := v2 * #1000000
+t17 := t18 + v4
+WRITE t17
+ARG v4
+ARG v2
+ARG v3
+t26 := v1 - #1
+ARG t26
+t22 := CALL f1
+LABEL label3 :
+RETURN #0
+FUNCTION main :
+v5 := #3
+ARG #3
+ARG #2
+ARG #1
+ARG v5
+t31 := CALL f1
+RETURN #0

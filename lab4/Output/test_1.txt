@@ -1,0 +1,1 @@
+can not translate: there may be a=b=c where a,b,c are all array.
