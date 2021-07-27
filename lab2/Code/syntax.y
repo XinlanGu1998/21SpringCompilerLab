@@ -210,6 +210,7 @@ int main(int argc, char** argv)
 		check_vacuum(root);
 		//print_tree(root,0);
 		Program(root);
+		check_func_def();
 	}else{
 		printf("Lexical or syntax error.\n");
 	}

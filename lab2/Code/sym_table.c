@@ -4,7 +4,8 @@
 St_Type *struct_table[0x3fff];
 Sym_Type *symbol_table[0x3fff];
 F_Type *function_table[0x3fff];
-
+func_list* function_list;
+FieldList* present_field;
 //封装一下strcmp，逻辑上直观点
 bool isToken(Node* node,const char* tokenName){
     assert(node);
@@ -64,7 +65,23 @@ F_Type *find_Func(char *name)
     //fprintf(stderr, "failed.\n");
     return NULL;
 }
-
+void check_func_def()//deal with error type 18
+{
+    func_list* node=function_list;
+    while(node !=NULL)
+    {
+        F_Type* func_1=find_Func(node->name);
+        if(!func_1->defined) print_error(18,func_1->line,node->name);
+        node=node->next;
+    }
+}
+void insert_into_func_list(char*name)
+{
+    func_list* temp=(func_list*)malloc(sizeof(func_list));
+    temp->next=function_list;
+    function_list=temp;
+    temp->name=name;
+}
 Sym_Type *find_Sym(char *name)
 {
     //fprintf(stderr,"find_Sym:name=%s, ",name);
@@ -120,6 +137,7 @@ void insert_Func(char *name, bool defined, int dim, Type *r_type, struct t_paral
     p->r_type = r_type;
     p->defined = defined;
     p->line = line;
+    insert_into_func_list(name);
 }
 
 bool type_check(Type *a, Type *b)
@@ -139,7 +157,7 @@ bool type_check(Type *a, Type *b)
     }
     else if (a->kind == STRUCTURE)
     {
-        if (!strcmp(a->u.structure->name, b->u.structure->name))
+        if (strcmp(a->u.structure->name, b->u.structure->name))
             return false;
     }
     return true;
@@ -243,7 +261,7 @@ void ExtDecList(Node *root, Type *type){
     assert(isToken(root, "ExtDecList"));
     //printf("ExtDecList\n");
     Node* var = root->child;
-    VarDec(var,type, NULL);
+    VarDec(var,type, NULL,true);
 
     //ExtDecList -> VarDec COMMMA ExtDecList
     if (var->next)
@@ -297,6 +315,7 @@ Type *StructSpecifier(Node *root){
     type->kind = STRUCTURE;
     type->u.structure = (FieldList*) malloc(sizeof(FieldList));
     type->u.structure->name = name;
+    present_field=type->u.structure;
     DefList(defList,type->u.structure);
     insert_Struc(type);
 
@@ -320,22 +339,36 @@ char *Tag(Node *root){
 }
 
 //Declarators
-void VarDec(Node *root, Type *type, FieldList* fieldsTail){
-    if (!root || root->vacuum) return;
+Type* VarDec(Node *root, Type *type, FieldList* fieldsTail, bool isDef){
+    if (!root || root->vacuum) return makeBasicType(0);
     assert(isToken(root,"VarDec"));
     //printf("VarDec\n");
     Node* first = root->child;
     //VarDec -> ID
     if (isToken(first,"ID")){
         char* varName = first->val;
-        if (find_Sym(varName) || find_Stru(varName)){
+        bool field_check=true;
+        if(fieldsTail){
+            for(FieldList* p=present_field->next;p!=NULL;p=p->next){
+                if(!strcmp(p->name,varName)){
+                    field_check=false;
+                    break;
+                }
+            }
+        }
+        if(!field_check){
+            print_error(15, root->line, varName);
+        }
+        else if ((find_Sym(varName) || find_Stru(varName))&&isDef){//declare no need to report the error
             print_error(3, root->line, varName);
         }else{
+            if(isDef)
             insert_Sym(type, varName);
-            if (fieldsTail){
+            if (fieldsTail){//STRUCTURE Def
                 fieldsTail->next = makeFieldList(type,varName);
             }
         }
+        return type;
     }else{  //first->name == "VarDec"
     //VarDec -> VarDec LB INT RB	
         Node* sizeNode = first->next->next;
@@ -346,7 +379,7 @@ void VarDec(Node *root, Type *type, FieldList* fieldsTail){
         type1->r_value = false;
         type1->u.array.elem = type;
         type1->u.array.size = size;
-        return VarDec(first,type1, fieldsTail);
+        return VarDec(first,type1, fieldsTail,isDef);
     }
 }
 
@@ -362,32 +395,37 @@ void FunDec(Node *root, Type *r_type, bool isDef){
     int* dim = (int*) malloc(sizeof(int));
     *dim = 0;
     if (isToken(varList,"VarList")){
-        para_list = VarList(varList, dim);//TODO: 这里需要增加根据isDef处理
+        para_list = VarList(varList, dim, isDef);//TODO: 这里需要增加根据isDef处理
     }
     int d = *dim;
     free(dim);
     F_Type* f = find_Func(fName);
     if (!f){
         insert_Func(fName,isDef,d,r_type,para_list,root->line);
-    }else{
-        if (!check_func(d,r_type,para_list,f)){
-            print_error(19,root->line, fName);
-        }else if (isDef){
-            if (f->defined){
+    }else/* already defined or declared */{if (isDef){
+            if (f->defined){//multiple defined
                 print_error(4,root->line, fName);
             }else{
-                f->defined = true;
+                if (!check_func(d,r_type,para_list,f)){//type un-consisted
+            print_error(19,root->line, fName);
+            }
+            else f->defined = true;
+            }
+        }
+        else{
+            if (!check_func(d,r_type,para_list,f)){//type un-consisted
+            print_error(19,root->line, fName);
             }
         }
     }
 }
 
-struct t_paralist *VarList(Node *root, int* dim){
+struct t_paralist *VarList(Node *root, int* dim, bool isDef){
     assert(root && !root->vacuum);
     assert(isToken(root, "VarList"));
     //printf("VarList\n");
     Node* first = root->child;
-    Type* type = ParamDec(first);
+    Type* type = ParamDec(first,isDef);
     (*dim)++;
     struct t_paralist* para_list = (struct t_paralist*) malloc(sizeof(struct t_paralist));
     para_list->para_type = type;
@@ -395,12 +433,12 @@ struct t_paralist *VarList(Node *root, int* dim){
     if (!first->next){
         para_list->next = NULL;
     }else{
-        para_list->next = VarList(first->next->next,dim);
+        para_list->next = VarList(first->next->next,dim,isDef);
     }
     return para_list;
 }
 
-Type *ParamDec(Node *root){
+Type *ParamDec(Node *root,bool isDef){
     assert(root && !root->vacuum);
     assert(isToken(root, "ParamDec"));
     //printf("ParamDec\n");
@@ -408,8 +446,8 @@ Type *ParamDec(Node *root){
     assert(isToken(typeNode,"Specifier"));
     Type* type = Specifier(typeNode);
     Node* varNode = typeNode->next;
-    VarDec(varNode,type, NULL);
-    return type;
+    Type* type_=VarDec(varNode,type, NULL, isDef);
+    return type_;
 }
 
 //Statements
@@ -509,11 +547,12 @@ void Dec(Node *root, Type *type, FieldList* fieldsTail){
     assert(isToken(root, "Dec"));
     //printf("Dec\n");
     Node* var = root->child;
-    VarDec(var,type, fieldsTail);
+    VarDec(var,type, fieldsTail,true);
     
     if (var->next){
         Node* op = var->next;
         assert(isToken(op,"ASSIGNOP"));
+        if(fieldsTail) print_error(15,root->line,"");
         Type* r_type = Exp(op->next);
         type_check(type,r_type);
     }
@@ -585,7 +624,7 @@ Type *Exp(Node *root){
     //只有INT和FLOAT可以取负
     if (isToken(first,"MINUS")){
         Type* type = Exp(first->next);
-        if (!type->kind==BASIC){
+        if (!(type->kind==BASIC)){
             print_error(7,root->line, NULL);
         }
         return type;
@@ -593,6 +632,11 @@ Type *Exp(Node *root){
 
     if (isToken(first,"Exp")){
         Type* t1 = Exp(first);
+        if(!t1)
+        {
+            printf("error line:%d   \"%s\"\n",root->line,first->child->child->val);
+            fflush(stdout);
+        }
         assert(t1);
         Node* optr = first->next;
         //结构体
@@ -627,7 +671,7 @@ Type *Exp(Node *root){
             if (!isINT(idx)){
                 print_error(12,root->line, NULL);
             }
-            return t1;
+            return t1->u.array.elem;
         }
         //以下为二元运算
         //右值不可在赋值符左边
@@ -641,10 +685,10 @@ Type *Exp(Node *root){
             return t1;
         }
         //只有INT和FLOAT可以进行加减乘除和比较
-        if (!t1->kind==BASIC && 
+        if (!(t1->kind==BASIC) && 
         (isToken(optr,"RELOP") 
         || isToken(optr,"PLUS") || isToken(optr,"MINUS") 
-        || isToken(optr,"STAR") || isToken(optr,"DIV") )){  
+        || isToken(optr,"STAR") || isToken(optr,"DIV") )){ 
             print_error(7,root->line, NULL);
             return t1;
         }
@@ -659,6 +703,7 @@ Type *Exp(Node *root){
             print_error(7,root->line, NULL);
             return t1;
         }
+        return t1;
     }
 } 
 
@@ -726,7 +771,7 @@ void print_error(int errorNo,int line, char* name){
         printf("Non-existent field \"%s\".\n", name);
         break;
     case 15:  
-        printf("Redefined field \"%s\".\n", name);
+        printf("Redefined or initialed field.\n");
         break;
     case 16:  
         printf("Duplicated name \"%s\".\n", name);

@@ -1,6 +1,6 @@
 struct Position
 {
-    float x, y;
+    int x=0;
     int x;
 };
 

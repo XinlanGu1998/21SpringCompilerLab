@@ -2,6 +2,11 @@
 #define SYM_TABLE_H
 #include "syntax_tree.h"
 //VARIABLE
+typedef struct FUNCTIONLIST
+{
+    char* name;
+    struct FUNCTIONLIST* next;
+}func_list;
 typedef struct FieldList_ FieldList;
 typedef struct Type_
 {
@@ -77,10 +82,10 @@ char *OptTag(Node *root);
 char *Tag(Node *root);
 
 //Declarators
-void VarDec(Node *root, Type *type, FieldList* fieldsTail);
+Type* VarDec(Node *root, Type *type, FieldList* fieldsTail, bool isDef);
 void FunDec(Node *root, Type *r_type, bool isDef);
-Type *ParamDec(Node *root);
-struct t_paralist *VarList(Node *root, int* dim);
+Type *ParamDec(Node *root,bool isDef);
+struct t_paralist *VarList(Node *root, int* dim, bool isDef);
 
 //Statements
 void CompSt(Node *root, Type *r_type);
@@ -99,5 +104,6 @@ void Args(Node *root, struct t_paralist* para_list); //parameter_list, check eac
 
 //Error
 void print_error(int errorNo,int line, char* name);
+void check_func_def();
 
 #endif

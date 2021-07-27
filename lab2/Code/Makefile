@@ -55,7 +55,19 @@ test:
 	./parser ../Test/test17.c
 	./parser ../Test/test18.c
 	./parser ../Test/test19.c
-
+	./parser ../Test/test_a_1.c
+	./parser ../Test/test_a_2.c
+	./parser ../Test/test_a_3.c
+	./parser ../Test/test_a_4.c
+	./parser ../Test/test_a_5.c
+	./parser ../Test/test_b_1.c
+	./parser ../Test/test_c_1.c
+	./parser ../Test/test_c_2.c
+	./parser ../Test/test_d_1.c
+	./parser ../Test/test_d_2.c
+	./parser ../Test/test_d_3.c
+	./parser ../Test/test_e_1.c
+	./parser ../Test/my_test.c
 debug:
 	make parser
 	./parser ../Test/test0.c 1>../Output/test0.out 2> ../Log/test0.log
